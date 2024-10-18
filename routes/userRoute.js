@@ -1,6 +1,19 @@
 const express=require("express");
 const user_route =express();
 
+const session = require("express-session");
+
+const config =require("../config/config");
+
+user_route.use(session({
+    secret: config.sessionSecret,  // The secret for signing the session ID cookie
+    resave: false,  // Don't save session if unmodified
+    saveUninitialized: false,  // Don't create a session until something is stored
+    cookie: { maxAge: 60000 }  // Optional: configure the cookie expiration time (1 minute in this case)
+}));
+
+const auth=require("../middleware/auth");
+
 user_route.set('view engine','ejs');
 user_route.set('views','./views/users');
 
@@ -24,18 +37,18 @@ const upload =multer({storage:storage});
 
 const userController=require("../controllers/userController")
 
-user_route.get('/register',userController.loadRegister);
+user_route.get('/register',auth.isLogout,userController.loadRegister);
 
 user_route.post('/register',upload.single('image'),userController.insertUser);
 
 user_route.get('/verify',userController.verifyMail);
 
-user_route.get('/', userController.loginLoad);
+user_route.get('/',auth.isLogout,userController.loginLoad);
 
-user_route.get('/login', userController.loginLoad);
+user_route.get('/login',auth.isLogout,userController.loginLoad);
 
 user_route.post('/login', userController.verifyLogin);
 
-user_route.get('/home', userController.loadHome);
+user_route.get('/home', auth.isLogin,userController.loadHome);
 
 module.exports= user_route;

@@ -2,6 +2,8 @@ const User=require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const nodemailer=require("nodemailer");
 
+require('dotenv').config();
+
 const securePassword = async (password) => {
     try {
         const passwordHash = await bcrypt.hash(password, 10);
@@ -21,13 +23,13 @@ const sendVerifyMail =async(name,email,user_id)=>{
             secure:false,
             requireTLS:true,
             auth:{
-                user:'shubhbafna24@gmail.com',
-                pass:'wucbcwjdkoarjjyn'
+                user:process.env.EMAIL,
+                pass:process.env.PASSWORD
             }
         });
 
         const mailOptions ={
-            from: 'shubhbafna24@gmail.com',
+            from: process.env.EMAIL,
             to:email,
             subject:'For Verification Purpose',
             html:'<p> Hii '+name+ ', please click here to <a href="http://127.0.0.1:3000/verify?id='+user_id+'"> Verify </a> your mail .</p>'
@@ -138,6 +140,7 @@ const verifyLogin = async (req, res) => {
                     res.render('login', { message: "Please verify your mail." });
                     console.log("User not verified");
                 } else {
+                    req.session.user_id=userData._id;
                     res.redirect('/home');
                     console.log("Redirect to home");
                 }
