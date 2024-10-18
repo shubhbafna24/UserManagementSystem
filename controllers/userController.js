@@ -21,8 +21,8 @@ const sendVerifyMail =async(name,email,user_id)=>{
             secure:false,
             requireTLS:true,
             auth:{
-                user:'email',
-                pass:'passwd(screen_shot)'
+                user:'shubhbafna24@gmail.com',
+                pass:'wucbcwjdkoarjjyn'
             }
         });
 
@@ -62,13 +62,13 @@ const loadRegister =async(req,res)=>{
 
 const insertUser= async(req,res)=>{
     try {
-        const spassord=await securePassword(req.body.password);
+        const spassword=await securePassword(req.body.password);
         const user = new User({
             name:req.body.name,
             email:req.body.email,
             mobile:req.body.mno,
             image:req.file.filename,
-            password:spassord,
+            password:spassword,
             is_admin:0,
         });
 
@@ -101,8 +101,76 @@ const verifyMail =async(req,res)=>{
     }
 }
 
+//login user methods started
+
+const loginLoad = async (req,res)=>{
+    try {
+        res.render('login');
+        
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const verifyLogin = async (req, res) => {
+    try {
+        console.log("Request Body:", req.body); // Log the entire request body
+        const email = req.body.email;
+        const password = req.body.password;
+
+        // const email ='shubhbafnaindia@gmail.com';
+        // const password='123'
+
+        // Log email and password
+        console.log("Email:", email);
+        console.log("Password:", password);
+
+        const userData = await User.findOne({ email: email });
+        console.log("User Data:", userData);
+
+        if (userData) {
+            const passwordMatch = await bcrypt.compare(password, userData.password);
+            console.log("Password Match:", passwordMatch);
+
+            if (passwordMatch) {
+                console.log("User Verified:", userData.is_verified);
+                if (userData.is_verified === 0) {
+                    res.render('login', { message: "Please verify your mail." });
+                    console.log("User not verified");
+                } else {
+                    res.redirect('/home');
+                    console.log("Redirect to home");
+                }
+            } else {
+                res.render('login', { message: "Email and password is incorrect" });
+                console.log("Password incorrect");
+            }
+        } else {
+            res.render('login', { message: "Email and password is incorrect" });
+            console.log("User not found");
+        }
+    } catch (error) {
+        console.log("Error:", error.message);
+    }
+};
+
+
+const loadHome = async (req,res)=>{
+    try {
+        res.render('home');
+
+    } catch (error) {
+
+        console.log(error.message);
+        
+    }
+}
+
 module.exports = {
     loadRegister,
     insertUser,
-    verifyMail
+    verifyMail,
+    loginLoad,
+    verifyLogin,
+    loadHome    
 }
