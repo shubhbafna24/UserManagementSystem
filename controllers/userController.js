@@ -292,6 +292,35 @@ const resetPassword= async(req,res)=>{
     }
 }
 
+// for verification send link
+
+const verificationLoad= async(req,res)=>{
+    try {
+        res.render('verification');
+        
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const sendVerificationLink= async(req,res)=>{
+    try {
+        const email=req.body.email;
+        const UserData=await User.findOne({email:email});
+
+        if(UserData){
+            sendVerifyMail(UserData.name,UserData.email,UserData._id);
+            res.render('verification',{message:"Verification mail is sent to your email id"})
+        }
+        else
+        {
+            res.render('verification',{message:"This email is not registered"})
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 module.exports = {
     loadRegister,
     insertUser,
@@ -303,5 +332,7 @@ module.exports = {
     forgetLoad,
     forgetVerify,
     forgetPasswordLoad,
-    resetPassword
+    resetPassword,
+    verificationLoad,
+    sendVerificationLink
 }
