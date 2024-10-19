@@ -8,6 +8,10 @@ const app=express();
 const userRoute=require('./routes/userRoute');
 app.use('/',userRoute);
 
+//for admin routes
+const adminRoute=require('./routes/adminRoute');
+app.use('/admin',adminRoute);
+
 app.listen(3000,function(){
     console.log("Server is Running");
 })
