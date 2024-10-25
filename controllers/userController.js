@@ -133,6 +133,14 @@ const insertUser= async(req,res)=>{
 const verifyMail =async(req,res)=>{
     
     try {
+        //new code added to prevent
+        // Cast to ObjectId failed for value "{ _id: undefined }" (type Object) at path "_id" for model "User"
+
+        const userId = req.query.id;
+        if (!userId) {
+            console.log("User ID is undefined");
+            return res.render("404", { message: "Invalid User ID" });
+        }
         const updateInfo= await User.updateOne({_id:req.query.id},{ $set:{ is_verified:1 } });
 
         console.log(updateInfo);
@@ -180,10 +188,12 @@ const verifyLogin = async (req, res) => {
                 if (userData.is_verified === 0) {
                     res.render('login', { message: "Please verify your mail." });
                     console.log("User not verified");
+                    return;
                 } else {
                     req.session.user_id=userData._id;
-                    res.redirect('/home');
+                    
                     console.log("Redirect to home");
+                    return res.redirect('/home');
                 }
             } else {
                 res.render('login', { message: "Email and password is incorrect" });
@@ -201,6 +211,15 @@ const verifyLogin = async (req, res) => {
 
 const loadHome = async (req,res)=>{
     try {
+        //new code added to prevent
+        // Cast to ObjectId failed for value "{ _id: undefined }" (type Object) at path "_id" for model "User"
+        
+        const userId = req.query.id;
+        if (!userId) {
+            console.log("User ID is undefined");
+            return res.render("404", { message: "Invalid User ID" });
+        }
+
         const userData = await User.findById({_id: req.session.user_id});
         res.render('home',{user:userData});
 
@@ -213,8 +232,13 @@ const loadHome = async (req,res)=>{
 
 const userLogout = async(req,res)=>{
     try {
-        req.session.destroy();
-        res.redirect('/');
+        // req.session.destroy();
+        // res.redirect('/');
+        
+        req.session.destroy((err) => {
+            if (err) console.log("Session destruction error:", err);
+            res.redirect('/');
+        });
         
     } catch (error) {
         console.log(error.message);
@@ -326,8 +350,16 @@ const sendVerificationLink= async(req,res)=>{
 
 const editLoad= async(req,res)=>{
     try {
-        const id = req.query.id;
+        //new code added to prevent
+        // Cast to ObjectId failed for value "{ _id: undefined }" (type Object) at path "_id" for model "User"
+        
+        const userId = req.query.id;
+        if (!userId) {
+            console.log("User ID is undefined");
+            return res.render("404", { message: "Invalid User ID" });
+        }
 
+        const id = req.query.id;
         const userData = await User.findById({_id:id});
 
         if(userData)
