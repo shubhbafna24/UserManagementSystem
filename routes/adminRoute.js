@@ -26,6 +26,13 @@ admin_route.get('/home',auth.isLogin,adminController.loadDashboard);
 
 admin_route.get('/logout',auth.isLogin, adminController.logout);
 
+admin_route.get('/forget',auth.isLogout, adminController.forgetLoad);
+admin_route.post('/forget', adminController.forgetVerify);
+
+admin_route.get('/forget-password', auth.isLogout,adminController.forgetPasswordLoad);
+
+admin_route.post('/forget-password', adminController.resetPassword);
+
 admin_route.get('*',function(req,res){
 
     res.redirect('/admin');
