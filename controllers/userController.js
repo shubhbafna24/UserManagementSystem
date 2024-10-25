@@ -209,26 +209,17 @@ const verifyLogin = async (req, res) => {
 };
 
 
-const loadHome = async (req,res)=>{
+const loadHome = async (req, res) => {
     try {
-        //new code added to prevent
-        // Cast to ObjectId failed for value "{ _id: undefined }" (type Object) at path "_id" for model "User"
-        
-        const userId = req.query.id;
-        if (!userId) {
-            console.log("User ID is undefined");
-            return res.render("404", { message: "Invalid User ID" });
+        const userData = await User.findById({ _id: req.session.user_id });
+        if (!userData) {
+            return res.render("404", { message: "User not found" });
         }
-
-        const userData = await User.findById({_id: req.session.user_id});
-        res.render('home',{user:userData});
-
+        res.render('home', { user: userData });
     } catch (error) {
-
         console.log(error.message);
-        
     }
-}
+};
 
 const userLogout = async(req,res)=>{
     try {
@@ -348,33 +339,18 @@ const sendVerificationLink= async(req,res)=>{
 
 //user profile edit and update
 
-const editLoad= async(req,res)=>{
+const editLoad = async (req, res) => {
     try {
-        //new code added to prevent
-        // Cast to ObjectId failed for value "{ _id: undefined }" (type Object) at path "_id" for model "User"
-        
-        const userId = req.query.id;
-        if (!userId) {
-            console.log("User ID is undefined");
-            return res.render("404", { message: "Invalid User ID" });
-        }
-
-        const id = req.query.id;
-        const userData = await User.findById({_id:id});
-
-        if(userData)
-        {
-            res.render('edit',{ user: userData});
-        }
-        else
-        {
+        const userData = await User.findById({ _id: req.session.user_id });
+        if (userData) {
+            res.render('edit', { user: userData });
+        } else {
             res.redirect('/home');
         }
-        
     } catch (error) {
         console.log(error.message);
     }
-}
+};
 
 const updateProfile = async (req, res) => {
     try {
