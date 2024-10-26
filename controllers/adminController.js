@@ -307,6 +307,7 @@ const editUserLoad = async (req, res) => {
         } else {
             // If no userData found, redirect or send a 404 message
             return res.status(404).send("User not found");
+            // res.redirect('/admin/dashboard');
         }
     } catch (error) {
         console.log(error.message);
